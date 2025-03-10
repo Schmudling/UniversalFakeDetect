@@ -285,10 +285,10 @@ if __name__ == '__main__':
     if (opt.real_path == None) or (opt.fake_path == None) or (opt.data_mode == None):
         dataset_paths = DATASET_PATHS
     else:
-        dataset_paths = [ dict(real_path=opt.real_path, fake_path=opt.fake_path, data_mode=opt.data_mode) ]
+        dataset_paths = [ dict(real_path=opt.real_path, fake_path=opt.fake_path) ]
 
 
-
+    print(dataset_paths)
     for dataset_path in (dataset_paths):
         set_seed()
 
@@ -302,11 +302,23 @@ if __name__ == '__main__':
                                     )
 
         loader = torch.utils.data.DataLoader(dataset, batch_size=opt.batch_size, shuffle=False, num_workers=4)
+        
         ap, r_acc0, f_acc0, acc0, r_acc1, f_acc1, acc1, best_thres = validate(model, loader, find_thres=True)
+        
+        print("Evaluation of {}".format(dataset_path['key']))
 
+        print("Average Precision (AP): {}".format(ap))
+        print("Recall for Class 0 - Real images: {}".format(r_acc0))
+        print("F1 Score for Class 0 - Real images: {}".format(f_acc0))
+        print("Accuracy for Class 0 - Real images: {}".format(acc0))
+
+        print("Recall for Class 1 - fake images: {}".format(r_acc1))
+        print("F1 Score for Class 1 - fake images: {}".format(f_acc1))
+        print("Accuracy for Class 1 - fake images: {}".format(acc1))
+
+        print("Best Threshold: {}".format(best_thres))
         with open( os.path.join(opt.result_folder,'ap.txt'), 'a') as f:
             f.write(dataset_path['key']+': ' + str(round(ap*100, 2))+'\n' )
 
         with open( os.path.join(opt.result_folder,'acc0.txt'), 'a') as f:
             f.write(dataset_path['key']+': ' + str(round(r_acc0*100, 2))+'  '+str(round(f_acc0*100, 2))+'  '+str(round(acc0*100, 2))+'\n' )
-
